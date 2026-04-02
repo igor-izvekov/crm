@@ -5,11 +5,10 @@ import (
     "log"
     "os"
     "path/filepath"
-    "reflect"
     
     "gorm.io/gorm"
     
-    "crm/models"
+    "github.com/igor-izvekov/crm/pkg/models"
 )
 
 type Loader interface {
@@ -170,10 +169,6 @@ func Seed(db *gorm.DB) error {
 
 func SeedWithConfig(db *gorm.DB, config *SeedConfig) error {
     log.Println("Заполняем тестовыми данными из JSON файлов")
-    
-    if err := clearExistingData(db); err != nil {
-        return err
-    }
     
     loaders := []func(*gorm.DB, string) error{
         loadAndSaveClients,

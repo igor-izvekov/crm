@@ -5,13 +5,13 @@ import (
 
 	"gorm.io/gorm"
 
-	"crm/models"
+	"github.com/igor-izvekov/crm/pkg/models"
 )
 
 func AutoMigrate(db *gorm.DB) error {
 	log.Println("Запускаем миграции")
 
-	err = db.AutoMigrate(
+	err := db.AutoMigrate(
 		&models.Client{},
 		&models.Manager{},
 		&models.RealEstateObject{},
@@ -32,7 +32,7 @@ func AutoMigrate(db *gorm.DB) error {
 
 func DropAllTables(db *gorm.DB) error {
 	err := db.Migrator().DropTable(
-		&models.Commision{},
+		&models.Commission{},
 		&models.Payment{},
 		&models.Document{},
 		&models.Deal{},

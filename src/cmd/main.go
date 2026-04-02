@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"github.com/igor-izvekov/crm/pkg/database"
+	"github.com/igor-izvekov/crm/pkg/migrations"
+)
 
 func main() {
-	fmt.Println("Hello, world!")
+	if err := database.Connect("crm.db"); err != nil {
+		panic(err)
+	}
+
+	db := database.GetDB()
+	if err := migrations.AutoMigrate(db); err != nil {
+		panic(err)
+	}
 }
