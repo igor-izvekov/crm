@@ -1,0 +1,46 @@
+{
+  "commissions": [
+    {
+      "deal_id": 1,
+      "type": "percent",
+      "value": 5.0,
+      "amount": 625000
+    },
+    {
+      "deal_id": 2,
+      "type": "percent",
+      "value": 4.5,
+      "amount": 823500
+    },
+    {
+      "deal_id": 3,
+      "type": "fixed",
+      "value": 300000,
+      "amount": 300000
+    },
+    {
+      "deal_id": 4,
+      "type": "percent",
+      "value": 3.5,
+      "amount": 1540000
+    },
+    {
+      "deal_id": 5,
+      "type": "percent",
+      "value": 5.0,
+      "amount": 550000
+    },
+    {
+      "deal_id": 6,
+      "type": "percent",
+      "value": 4.0,
+      "amount": 244000
+    },
+    {
+      "deal_id": 7,
+      "type": "percent",
+      "value": 2.5,
+      "amount": 2325000
+    }
+  ]
+}

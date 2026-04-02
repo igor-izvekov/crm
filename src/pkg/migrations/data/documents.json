@@ -1,0 +1,36 @@
+{
+  "documents": [
+    {
+      "deal_id": 1,
+      "name": "паспорт_продавца.pdf",
+      "file_path": "/uploads/deal_1/passport_seller.pdf",
+      "file_size": 245760,
+      "mime_type": "application/pdf",
+      "uploaded_by": 1
+    },
+    {
+      "deal_id": 1,
+      "name": "договор_купли_продажи.pdf",
+      "file_path": "/uploads/deal_1/contract.pdf",
+      "file_size": 512000,
+      "mime_type": "application/pdf",
+      "uploaded_by": 1
+    },
+    {
+      "deal_id": 2,
+      "name": "выписка_егрн.pdf",
+      "file_path": "/uploads/deal_2/egrn.pdf",
+      "file_size": 189440,
+      "mime_type": "application/pdf",
+      "uploaded_by": 2
+    },
+    {
+      "deal_id": 3,
+      "name": "акт_приема_передачи.pdf",
+      "file_path": "/uploads/deal_3/act.pdf",
+      "file_size": 156000,
+      "mime_type": "application/pdf",
+      "uploaded_by": 1
+    }
+  ]
+}

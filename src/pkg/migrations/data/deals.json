@@ -1,0 +1,60 @@
+{
+  "deals": [
+    {
+      "seller_id": 1,
+      "buyer_id": 2,
+      "real_estate_object_id": 1,
+      "amount": 12500000,
+      "stage": "negotiations",
+      "manager_id": 1
+    },
+    {
+      "seller_id": 3,
+      "buyer_id": 4,
+      "real_estate_object_id": 2,
+      "amount": 18300000,
+      "stage": "document_prep",
+      "manager_id": 2
+    },
+    {
+      "seller_id": 6,
+      "buyer_id": 5,
+      "real_estate_object_id": 3,
+      "amount": 9500000,
+      "stage": "waiting_payment",
+      "manager_id": 1
+    },
+    {
+      "seller_id": 8,
+      "buyer_id": 9,
+      "real_estate_object_id": 4,
+      "amount": 44000000,
+      "stage": "negotiations",
+      "manager_id": 3
+    },
+    {
+      "seller_id": 10,
+      "buyer_id": 7,
+      "real_estate_object_id": 5,
+      "amount": 11000000,
+      "stage": "completed",
+      "manager_id": 2
+    },
+    {
+      "seller_id": 1,
+      "buyer_id": 9,
+      "real_estate_object_id": 6,
+      "amount": 6100000,
+      "stage": "new",
+      "manager_id": 1
+    },
+    {
+      "seller_id": 3,
+      "buyer_id": 5,
+      "real_estate_object_id": 7,
+      "amount": 93000000,
+      "stage": "negotiations",
+      "manager_id": 3
+    }
+  ]
+}
