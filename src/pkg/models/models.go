@@ -32,12 +32,10 @@ type RealEstateObject struct {
 	Cost        float64      `gorm:"not null" json:"cost"`                   // стоимость
 	Description string       `gorm:"size:2000" json:"description"`           // описание
 	Status      ObjectStatus `gorm:"default:active;size:20" json:"status"`   // статус объекта
-	SellerID    uint         `gorm:"not null;index" json:"seller_id"`        // продавец
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 
 	// Связи
-	Seller Client           `gorm:"foreignKey:SellerID" json:"seller,omitempty"`
 	Deals  []Deal           `gorm:"foreignKey:RealEstateObjectID" json:"deals,omitempty"`
 }
 
@@ -45,7 +43,6 @@ type DealStage string
 
 const (
 	DealStageNew            DealStage = "new"              // новая сделка
-	DealStageNegotiations   DealStage = "negotiations"     // переговоры
 	DealStageDocumentPrep   DealStage = "document_prep"    // подготовка документов
 	DealStageWaitingPayment DealStage = "waiting_payment"  // ожидание оплаты
 	DealStageCompleted      DealStage = "completed"        // завершена
@@ -114,24 +111,6 @@ type Payment struct {
 	Amount    float64     `gorm:"not null" json:"amount"`        // сумма
 	Type      PaymentType `gorm:"size:30" json:"type"`           // тип оплаты
 	CreatedAt time.Time   `json:"created_at"`
-
-	// Связь
-	Deal Deal `gorm:"foreignKey:DealID" json:"deal,omitempty"`
-}
-
-type CommissionType string
-
-const (
-	CommissionTypeFixed   CommissionType = "fixed"    // фиксированная
-	CommissionTypePercent CommissionType = "percent"  // процент
-)
-
-type Commission struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
-	DealID    uint           `gorm:"not null;uniqueIndex" json:"deal_id"` // одна комиссия на сделку
-	Type      CommissionType `gorm:"default:percent;size:20" json:"type"` // тип
-	Value     float64        `gorm:"not null" json:"value"`               // значение (сумма или %)
-	Amount    float64        `json:"amount"`                              // итоговая сумма комиссии (рассчитанная)
 
 	// Связь
 	Deal Deal `gorm:"foreignKey:DealID" json:"deal,omitempty"`
