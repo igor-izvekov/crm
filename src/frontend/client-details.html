@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточка клиента | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Защита страницы: без токена редирект на вход -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <a href="clients.html" class="btn btn-secondary btn-sm">← К списку клиентов</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <h2 class="mb-md" id="pageTitle">Загрузка...</h2>
+
+        <!-- Основная информация -->
+        <div class="card mb-md">
+            <div class="form-group">
+                <label class="form-label">ФИО</label>
+                <div id="info-fio" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Тип клиента</label>
+                <div id="info-type" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Контакты</label>
+                <div id="info-contact" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Комментарий</label>
+                <div id="info-comment" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <button id="editBtn" class="btn btn-sm">Редактировать</button>
+        </div>
+
+        <!-- История взаимодействий -->
+        <h3 class="mb-md">История взаимодействий</h3>
+        <div class="card table-wrap mb-md">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Дата</th>
+                        <th style="width: 25%;">Тип</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Сделки клиента -->
+        <h3 class="mb-md">Сделки клиента</h3>
+        <div class="card table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Объект</th>
+                        <th>Роль в сделке</th>
+                        <th>Сумма</th>
+                        <th>Этап</th>
+                    </tr>
+                </thead>
+                <tbody id="dealsBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // ===== ПОЛУЧЕНИЕ ID ИЗ URL =====
+        const params = new URLSearchParams(window.location.search);
+        const clientId = params.get('id') || 1; // Заглушка: если ID нет, берём 1
+
+        // ===== ЗАГЛУШКИ ДАННЫХ =====
+        const mockClient = {
+            fio: 'Иванов Иван Иванович',
+            type: 'Покупатель',
+            contact: 'ivan@mail.ru | +7 900 111-22-33',
+            comment: 'Ищет 2-комнатную квартиру в центре, бюджет до 15 млн ₽'
+        };
+
+        const mockHistory = [
+            { date: '2026-04-01', type: 'Звонок', desc: 'Обсуждали варианты на ул. Ленина' },
+            { date: '2026-03-28', type: 'Встреча', desc: 'Показ объекта пр. Мира, 45' },
+            { date: '2026-03-20', type: 'Заявка', desc: 'Первичное обращение через сайт' }
+        ];
+
+        const mockDeals = [
+            { id: 101, object: 'ул. Ленина, 10, кв. 5', role: 'Покупатель', amount: '12 000 000 ₽', stage: 'Переговоры' },
+            { id: 102, object: 'пр. Мира, 45, офис 302', role: 'Покупатель', amount: '8 500 000 ₽', stage: 'Завершена' }
+        ];
+
+        // ===== РЕНДЕР ДАННЫХ =====
+        function renderPage() {
+            document.getElementById('pageTitle').textContent = `Клиент #${clientId}`;
+            document.getElementById('info-fio').textContent = mockClient.fio;
+            document.getElementById('info-type').textContent = mockClient.type;
+            document.getElementById('info-contact').textContent = mockClient.contact;
+            document.getElementById('info-comment').textContent = mockClient.comment;
+
+            // История
+            const histBody = document.getElementById('historyBody');
+            histBody.innerHTML = mockHistory.length ? mockHistory.map(h => 
+                `<tr><td>${h.date}</td><td>${h.type}</td><td>${h.desc}</td></tr>`
+            ).join('') : '<tr><td colspan="3" class="text-center text-muted">Записей нет</td></tr>';
+
+            // Сделки
+            const dealsBody = document.getElementById('dealsBody');
+            dealsBody.innerHTML = mockDeals.length ? mockDeals.map(d => 
+                `<tr>
+                    <td><a href="deal-details.html?id=${d.id}">${d.object}</a></td>
+                    <td>${d.role}</td>
+                    <td>${d.amount}</td>
+                    <td>${d.stage}</td>
+                </tr>`
+            ).join('') : '<tr><td colspan="4" class="text-center text-muted">Сделок нет</td></tr>';
+        }
+
+        // ===== ДЕЙСТВИЯ (ЗАГЛУШКИ) =====
+        document.getElementById('editBtn').addEventListener('click', () => {
+            alert(`[Заглушка] Открытие формы редактирования. GET /api/v1/clients/${clientId} → PUT /api/v1/clients/${clientId}`);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // TODO: Заменить на реальный запрос:
+            // const [client, history, deals] = await Promise.all([
+            //   fetch(`/api/v1/clients/${clientId}`, { headers: { Authorization: `Bearer ${token}` } }).then(r=>r.json()),
+            //   fetch(`/api/v1/clients/${clientId}/history`, ...),
+            //   fetch(`/api/v1/clients/${clientId}/deals`, ...)
+            // ]);
+            renderPage();
+        });
+    </script>
+</body>
+</html>

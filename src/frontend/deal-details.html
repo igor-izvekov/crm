@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточка сделки | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Защита страницы: без токена редирект на вход -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <a href="deals.html" class="btn btn-secondary btn-sm">← К списку сделок</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <h2 class="mb-md" id="pageTitle">Загрузка...</h2>
+
+        <!-- Основная информация -->
+        <div class="card mb-md">
+            <div class="form-group">
+                <label class="form-label">Продавец</label>
+                <div id="info-seller" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Покупатель</label>
+                <div id="info-buyer" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Объект недвижимости</label>
+                <div id="info-object" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Дата создания</label>
+                <div id="info-date" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Сумма сделки</label>
+                <div id="info-amount" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ответственный менеджер</label>
+                <div id="info-manager" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Текущий этап</label>
+                <div id="info-stage" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border); font-weight: 600;">—</div>
+            </div>
+            <button id="nextStageBtn" class="btn btn-sm">Следующий этап</button>
+        </div>
+
+        <!-- Комиссия -->
+        <div class="card mb-md">
+            <h3 style="margin-bottom: var(--space-sm);">Комиссия агентства</h3>
+            <div id="info-commission" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border); font-weight: 600;">—</div>
+        </div>
+
+        <!-- Оплаты -->
+        <h3 class="mb-md">Оплаты по сделке</h3>
+        <div class="card table-wrap mb-md">
+            <table>
+                <thead>
+                    <tr><th>Дата</th><th>Сумма</th><th>Тип</th><th>Комментарий</th></tr>
+                </thead>
+                <tbody id="paymentsBody"></tbody>
+            </table>
+            <div class="flex mt-md" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <p><strong>Оплачено:</strong> <span id="totalPaid">0 ₽</span></p>
+                <p><strong>Остаток:</strong> <span id="remainingAmount">0 ₽</span></p>
+            </div>
+            <button id="addPaymentBtn" class="btn btn-sm mt-md">+ Добавить оплату</button>
+        </div>
+
+        <!-- Документы -->
+        <h3 class="mb-md">Документы</h3>
+        <div class="card table-wrap mb-md">
+            <table>
+                <thead>
+                    <tr><th>Название</th><th>Тип</th><th>Дата</th><th>Действие</th></tr>
+                </thead>
+                <tbody id="docsBody"></tbody>
+            </table>
+            <button id="uploadDocBtn" class="btn btn-sm mt-md">+ Загрузить документ</button>
+        </div>
+    </main>
+
+    <script>
+        // ===== ID ИЗ URL =====
+        const params = new URLSearchParams(window.location.search);
+        const dealId = params.get('id') || 101;
+
+        // ===== ЗАГЛУШКИ ДАННЫХ =====
+        const mockDeal = {
+            seller: 'Петрова Анна Сергеевна',
+            buyer: 'Иванов Иван Иванович',
+            object: 'ул. Ленина, 10, кв. 5',
+            date: '2026-04-01',
+            amount: '12 000 000 ₽',
+            manager: 'Смирнов К.А.',
+            stage: 'Переговоры',
+            commission: '5% от суммы → 600 000 ₽'
+        };
+
+        const mockPayments = [
+            { date: '2026-04-01', amount: '1 000 000 ₽', type: 'Задаток', comment: 'Перевод на р/с' },
+            { date: '2026-04-05', amount: '3 000 000 ₽', type: 'Безнал', comment: 'Ипотечные средства' }
+        ];
+
+        const mockDocs = [
+            { name: 'Договор бронирования.pdf', type: 'Договор', date: '2026-04-01', id: 1 },
+            { name: 'Паспорт покупателя.pdf', type: 'Паспортные данные', date: '2026-04-02', id: 2 }
+        ];
+
+        // ===== РЕНДЕР =====
+        function renderPage() {
+            document.getElementById('pageTitle').textContent = `Сделка #${dealId}`;
+            document.getElementById('info-seller').textContent = mockDeal.seller;
+            document.getElementById('info-buyer').textContent = mockDeal.buyer;
+            document.getElementById('info-object').textContent = mockDeal.object;
+            document.getElementById('info-date').textContent = mockDeal.date;
+            document.getElementById('info-amount').textContent = mockDeal.amount;
+            document.getElementById('info-manager').textContent = mockDeal.manager;
+            document.getElementById('info-stage').textContent = mockDeal.stage;
+            document.getElementById('info-commission').textContent = mockDeal.commission;
+
+            // Оплаты
+            const payBody = document.getElementById('paymentsBody');
+            payBody.innerHTML = mockPayments.length ? mockPayments.map(p => 
+                `<tr><td>${p.date}</td><td>${p.amount}</td><td>${p.type}</td><td>${p.comment}</td></tr>`
+            ).join('') : '<tr><td colspan="4" class="text-center text-muted">Оплат нет</td></tr>';
+
+            document.getElementById('totalPaid').textContent = '4 000 000 ₽'; // Заглушка суммы
+            document.getElementById('remainingAmount').textContent = '8 000 000 ₽'; // Заглушка остатка
+
+            // Документы
+            const docBody = document.getElementById('docsBody');
+            docBody.innerHTML = mockDocs.length ? mockDocs.map(d => 
+                `<tr>
+                    <td>${d.name}</td><td>${d.type}</td><td>${d.date}</td>
+                    <td><button class="btn btn-sm btn-secondary" onclick="alert('[Заглушка] Скачивание /api/v1/documents/${d.id}')">Скачать</button></td>
+                </tr>`
+            ).join('') : '<tr><td colspan="4" class="text-center text-muted">Документов нет</td></tr>';
+        }
+
+        // ===== ДЕЙСТВИЯ (ЗАГЛУШКИ) =====
+        document.getElementById('nextStageBtn').addEventListener('click', () => {
+            alert(`[Заглушка] Перевод на следующий этап. PATCH /api/v1/deals/${dealId}/stage`);
+        });
+
+        document.getElementById('addPaymentBtn').addEventListener('click', () => {
+            alert(`[Заглушка] Форма добавления оплаты. POST /api/v1/payments`);
+        });
+
+        document.getElementById('uploadDocBtn').addEventListener('click', () => {
+            alert(`[Заглушка] Открытие окна загрузки. POST /api/v1/documents/upload`);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // TODO: Заменить на реальные запросы:
+            // const [deal, payments, docs] = await Promise.all([
+            //   fetch(`/api/v1/deals/${dealId}`, { headers: { Authorization: `Bearer ${token}` } }).then(r=>r.json()),
+            //   fetch(`/api/v1/payments/deal/${dealId}`, ...),
+            //   fetch(`/api/v1/documents/deal/${dealId}`, ...)
+            // ]);
+            renderPage();
+        });
+    </script>
+</body>
+</html>

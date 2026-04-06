@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клиенты | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Защита страницы: без токена редирект на вход -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <a href="index.html" class="btn btn-secondary btn-sm">← На главную</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <!-- Заголовок и кнопка создания -->
+        <div class="flex mb-md" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <h2>Клиенты</h2>
+            <button id="addClientBtn" class="btn btn-sm">+ Добавить клиента</button>
+        </div>
+
+        <!-- Поиск -->
+        <div class="flex mb-md">
+            <input type="text" id="searchInput" class="input" placeholder="Поиск по ФИО...">
+            <button class="btn btn-sm" onclick="searchClients()">Найти</button>
+        </div>
+
+        <!-- Таблица клиентов -->
+        <div class="card table-wrap">
+            <table id="clientsTable">
+                <thead>
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Тип</th>
+                        <th>Контакты</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTableBody">
+                    <!-- Данные подставляются через JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // ===== ЗАГЛУШКИ ДАННЫХ =====
+        const mockClients = [
+            { id: 1, fio: 'Иванов Иван Иванович', type: 'Покупатель', contact: 'ivan@mail.ru | +7 900 111-22-33' },
+            { id: 2, fio: 'Петрова Анна Сергеевна', type: 'Продавец', contact: 'anna@mail.ru | +7 900 222-33-44' },
+            { id: 3, fio: 'Сидоров Петр Васильевич', type: 'Покупатель', contact: 'sidorov@mail.ru | +7 900 333-44-55' }
+        ];
+
+        // ===== РЕНДЕР ТАБЛИЦЫ =====
+        function renderClients(clients) {
+            const tbody = document.getElementById('clientsTableBody');
+            tbody.innerHTML = '';
+
+            if (clients.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Клиенты не найдены</td></tr>';
+                return;
+            }
+
+            clients.forEach(client => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="client-details.html?id=${client.id}">${client.fio}</a></td>
+                    <td>${client.type}</td>
+                    <td>${client.contact}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editClient(${client.id})">Изменить</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===== ПОИСК (ЗАГЛУШКА) =====
+        function searchClients() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            // TODO: Заменить на fetch(`/api/v1/clients/search?q=${encodeURIComponent(query)}`)
+            const filtered = mockClients.filter(c => c.fio.toLowerCase().includes(query));
+            renderClients(filtered);
+        }
+
+        // ===== ДЕЙСТВИЯ (ЗАГЛУШКИ) =====
+        document.getElementById('addClientBtn').addEventListener('click', () => {
+            alert('[Заглушка] Открытие формы создания. POST /api/v1/clients');
+        });
+
+        function editClient(id) {
+            alert(`[Заглушка] Редактирование клиента #${id}. PUT /api/v1/clients/${id}`);
+        }
+
+        // ===== ВЫХОД =====
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderClients(mockClients);
+
+            // Поиск по Enter
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchClients();
+            });
+        });
+    </script>
+</body>
+</html>

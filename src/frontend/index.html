@@ -1,11 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Главная | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Проверка токена до отрисовки страницы -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+           window.location.href = 'login.html';
+         }
+    </script>
 </head>
 <body>
-    <h1>CRM</h1>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0;">Панель управления</h2>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <!-- Статистика -->
+        <section class="flex flex-wrap mb-md">
+            <div class="card" style="flex: 1; min-width: 200px; margin: var(--space-sm); text-align: center;">
+                <h3 style="margin-bottom: var(--space-sm);">Активные сделки</h3>
+                <p id="stat-active" class="text-muted" style="font-size: 1.5rem; font-weight: 600;">—</p>
+            </div>
+            <div class="card" style="flex: 1; min-width: 200px; margin: var(--space-sm); text-align: center;">
+                <h3 style="margin-bottom: var(--space-sm);">Завершенные сделки</h3>
+                <p id="stat-completed" class="text-muted" style="font-size: 1.5rem; font-weight: 600;">—</p>
+            </div>
+            <div class="card" style="flex: 1; min-width: 200px; margin: var(--space-sm); text-align: center;">
+                <h3 style="margin-bottom: var(--space-sm);">Оплаты</h3>
+                <p id="stat-payments" class="text-muted" style="font-size: 1.5rem; font-weight: 600;">—</p>
+            </div>
+            <div class="card" style="flex: 1; min-width: 200px; margin: var(--space-sm); text-align: center;">
+                <h3 style="margin-bottom: var(--space-sm);">Комиссия</h3>
+                <p id="stat-commission" class="text-muted" style="font-size: 1.5rem; font-weight: 600;">—</p>
+            </div>
+        </section>
+
+        <!-- Быстрый поиск -->
+        <section class="card mb-md">
+            <h3>Быстрый поиск</h3>
+            <div class="flex mt-sm">
+                <input type="text" id="quickSearch" class="input" placeholder="ФИО клиента, адрес объекта или статус сделки...">
+                <button class="btn" onclick="handleSearch()">Найти</button>
+            </div>
+        </section>
+
+        <!-- Навигация -->
+        <nav class="flex flex-wrap mb-md">
+            <a href="clients.html" class="btn btn-sm"> Клиенты</a>
+            <a href="objects.html" class="btn btn-sm"> Объекты</a>
+            <a href="deals.html" class="btn btn-sm"> Сделки</a>
+            <a href="reports.html" class="btn btn-sm"> Отчёты</a>
+        </nav>
+    </main>
+
+    <script>
+        // ===== ЗАГЛУШКИ =====
+        
+        // Выход из системы
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // Имитация загрузки данных с API
+        async function loadDashboardData() {
+            try {
+                // Здесь будет реальный fetch: await fetch('/api/v1/dashboard/stats', { headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` } })
+                await new Promise(resolve => setTimeout(resolve, 400)); // задержка для имитации сети
+
+                // Моковые данные
+                document.getElementById('stat-active').textContent = '8';
+                document.getElementById('stat-completed').textContent = '42';
+                document.getElementById('stat-payments').textContent = '18 500 000 ₽';
+                document.getElementById('stat-commission').textContent = '1 480 000 ₽';
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+                document.getElementById('stat-active').textContent = 'Ошибка';
+            }
+        }
+
+        // Заглушка поиска
+        function handleSearch() {
+            const query = document.getElementById('quickSearch').value.trim();
+            if (!query) return alert('Введите запрос');
+            // В будущем: window.location.href = `search.html?q=${encodeURIComponent(query)}` или редирект в нужный раздел
+            alert(`[Заглушка] Переход к поиску по запросу: "${query}"`);
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
 </body>
 </html>

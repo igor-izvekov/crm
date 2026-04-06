@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="center-page">
+    <div class="card" style="width: 100%; max-width: 400px;">
+        <h1 class="text-center">Вход в систему</h1>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="input" required placeholder="manager@agency.ru">
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Пароль</label>
+                <input type="password" id="password" class="input" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="btn btn-block">Войти</button>
+            
+            <p id="errorMsg" class="text-center text-muted mt-md hidden"></p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            errorMsg.classList.add('hidden');
+
+            try {
+                // Запрос к эндпоину авторизации (адаптируйте под ваш бэкенд)
+                const res = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Неверный логин или пароль');
+                }
+
+                const data = await res.json();
+                
+                // Сохраняем токен и роль для дальнейшего использования
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('userRole', data.role); // 'admin' | 'manager'
+
+                // Переход на главную
+                window.location.href = 'index.html';
+            } catch (err) {
+                errorMsg.textContent = err.message;
+                errorMsg.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

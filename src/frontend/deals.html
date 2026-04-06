@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сделки | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Защита страницы: без токена редирект на вход -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <a href="index.html" class="btn btn-secondary btn-sm">← На главную</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <!-- Заголовок и кнопка создания -->
+        <div class="flex mb-md" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <h2>Сделки</h2>
+            <button id="addDealBtn" class="btn btn-sm">+ Создать сделку</button>
+        </div>
+
+        <!-- Поиск -->
+        <div class="flex mb-md">
+            <input type="text" id="searchInput" class="input" placeholder="Поиск по ФИО, адресу или этапу...">
+            <button class="btn btn-sm" onclick="searchDeals()">Найти</button>
+        </div>
+
+        <!-- Таблица сделок -->
+        <div class="card table-wrap">
+            <table id="dealsTable">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Объект</th>
+                        <th>Продавец</th>
+                        <th>Покупатель</th>
+                        <th>Дата</th>
+                        <th>Сумма</th>
+                        <th>Менеджер</th>
+                        <th>Этап</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="dealsTableBody">
+                    <!-- Данные подставляются через JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // ===== ЗАГЛУШКИ ДАННЫХ =====
+        const mockDeals = [
+            { id: 101, object: 'ул. Ленина, 10', seller: 'Петрова А.С.', buyer: 'Иванов И.И.', date: '2026-04-01', amount: '12 000 000 ₽', manager: 'Смирнов К.А.', stage: 'Переговоры' },
+            { id: 102, object: 'пр. Мира, 45', seller: 'Кузнецов В.П.', buyer: 'Сидоров П.В.', date: '2026-03-28', amount: '25 000 000 ₽', manager: 'Иванова М.Д.', stage: 'Подготовка документов' },
+            { id: 103, object: 'с. Лесное, 12', seller: 'Федорова О.Н.', buyer: 'Морозов Д.С.', date: '2026-03-15', amount: '45 000 000 ₽', manager: 'Смирнов К.А.', stage: 'Завершена' }
+        ];
+
+        // ===== РЕНДЕР ТАБЛИЦЫ =====
+        function renderDeals(list) {
+            const tbody = document.getElementById('dealsTableBody');
+            tbody.innerHTML = '';
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Сделки не найдены</td></tr>';
+                return;
+            }
+
+            list.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${d.id}</td>
+                    <td><a href="deal-details.html?id=${d.id}">${d.object}</a></td>
+                    <td>${d.seller}</td>
+                    <td>${d.buyer}</td>
+                    <td>${d.date}</td>
+                    <td>${d.amount}</td>
+                    <td>${d.manager}</td>
+                    <td>${d.stage}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="advanceStage(${d.id})">След. этап</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===== ПОИСК (ЗАГЛУШКА) =====
+        function searchDeals() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            // TODO: Заменить на fetch(`/api/v1/deals/search?q=${encodeURIComponent(query)}`)
+            const filtered = mockDeals.filter(d => 
+                d.seller.toLowerCase().includes(query) || 
+                d.buyer.toLowerCase().includes(query) || 
+                d.object.toLowerCase().includes(query) || 
+                d.stage.toLowerCase().includes(query)
+            );
+            renderDeals(filtered);
+        }
+
+        // ===== ДЕЙСТВИЯ (ЗАГЛУШКИ) =====
+        document.getElementById('addDealBtn').addEventListener('click', () => {
+            alert('[Заглушка] Открытие формы создания. POST /api/v1/deals');
+        });
+
+        function advanceStage(id) {
+            alert(`[Заглушка] Перевод сделки #${id} на следующий этап. PATCH /api/v1/deals/${id}/stage`);
+        }
+
+        // ===== ВЫХОД =====
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDeals(mockDeals);
+
+            // Поиск по Enter
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchDeals();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточка объекта | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Защита страницы: без токена редирект на вход -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <a href="objects.html" class="btn btn-secondary btn-sm">← К списку объектов</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <h2 class="mb-md" id="pageTitle">Загрузка...</h2>
+
+        <!-- Основная информация -->
+        <div class="card mb-md">
+            <div class="form-group">
+                <label class="form-label">Адрес</label>
+                <div id="info-address" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Тип объекта</label>
+                <div id="info-type" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Площадь</label>
+                <div id="info-area" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Стоимость</label>
+                <div id="info-price" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Текущий статус</label>
+                <div id="info-status" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Описание</label>
+                <div id="info-desc" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Продавец</label>
+                <div id="info-seller" style="padding: 0.6rem; background: #f9fafb; border-radius: var(--radius); border: 1px solid var(--border);">—</div>
+            </div>
+            <button id="editBtn" class="btn btn-sm">Редактировать</button>
+        </div>
+
+        <!-- Связанные сделки -->
+        <h3 class="mb-md">История сделок</h3>
+        <div class="card table-wrap mb-md">
+            <table>
+                <thead>
+                    <tr><th>Дата</th><th>Покупатель</th><th>Сумма</th><th>Этап</th></tr>
+                </thead>
+                <tbody id="dealsBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Документы -->
+        <h3 class="mb-md">Документы объекта</h3>
+        <div class="card table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Название</th><th>Тип</th><th>Дата добавления</th><th>Действие</th></tr>
+                </thead>
+                <tbody id="docsBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // ===== ПОЛУЧЕНИЕ ID ИЗ URL =====
+        const params = new URLSearchParams(window.location.search);
+        const objectId = params.get('id') || 1; // Заглушка: если ID нет, берём 1
+
+        // ===== ЗАГЛУШКИ ДАННЫХ =====
+        const mockObject = {
+            address: 'ул. Ленина, 10, кв. 5',
+            type: 'Квартира',
+            area: '65 м²',
+            price: '12 000 000 ₽',
+            status: 'Активен',
+            desc: 'Светлая двухкомнатная квартира с евроремонтом, рядом метро и парк.',
+            sellerId: 2,
+            sellerName: 'Петрова Анна Сергеевна'
+        };
+
+        const mockDeals = [
+            { date: '2026-03-15', buyer: 'Иванов И.И.', amount: '11 800 000 ₽', stage: 'Завершена' },
+            { date: '2026-04-02', buyer: 'Сидоров П.В.', amount: '12 000 000 ₽', stage: 'Ожидание оплаты' }
+        ];
+
+        const mockDocs = [
+            { name: 'Выписка ЕГРН.pdf', type: 'Сопроводительный', date: '2026-02-10', id: 1 },
+            { name: 'Договор купли-продажи.docx', type: 'Договор', date: '2026-03-20', id: 2 }
+        ];
+
+        // ===== РЕНДЕР ДАННЫХ =====
+        function renderPage() {
+            document.getElementById('pageTitle').textContent = `Объект #${objectId}`;
+            document.getElementById('info-address').textContent = mockObject.address;
+            document.getElementById('info-type').textContent = mockObject.type;
+            document.getElementById('info-area').textContent = mockObject.area;
+            document.getElementById('info-price').textContent = mockObject.price;
+            document.getElementById('info-status').textContent = mockObject.status;
+            document.getElementById('info-desc').textContent = mockObject.desc;
+            document.getElementById('info-seller').innerHTML = `<a href="client-details.html?id=${mockObject.sellerId}">${mockObject.sellerName}</a>`;
+
+            // Сделки
+            const dealsBody = document.getElementById('dealsBody');
+            dealsBody.innerHTML = mockDeals.length ? mockDeals.map(d => 
+                `<tr><td>${d.date}</td><td>${d.buyer}</td><td>${d.amount}</td><td>${d.stage}</td></tr>`
+            ).join('') : '<tr><td colspan="4" class="text-center text-muted">Сделок нет</td></tr>';
+
+            // Документы
+            const docsBody = document.getElementById('docsBody');
+            docsBody.innerHTML = mockDocs.length ? mockDocs.map(doc => 
+                `<tr>
+                    <td>${doc.name}</td>
+                    <td>${doc.type}</td>
+                    <td>${doc.date}</td>
+                    <td><button class="btn btn-sm btn-secondary" onclick="alert('[Заглушка] Скачивание /api/v1/documents/${doc.id}')">Скачать</button></td>
+                </tr>`
+            ).join('') : '<tr><td colspan="4" class="text-center text-muted">Документов нет</td></tr>';
+        }
+
+        // ===== ДЕЙСТВИЯ (ЗАГЛУШКИ) =====
+        document.getElementById('editBtn').addEventListener('click', () => {
+            alert(`[Заглушка] Редактирование объекта #${objectId}. PUT /api/v1/objects/${objectId}`);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // TODO: Заменить на реальный запрос:
+            // const [obj, deals, docs] = await Promise.all([
+            //   fetch(`/api/v1/objects/${objectId}`, { headers: { Authorization: `Bearer ${token}` } }).then(r=>r.json()),
+            //   fetch(`/api/v1/objects/${objectId}/deals`, ...),
+            //   fetch(`/api/v1/documents/object/${objectId}`, ...)
+            // ]);
+            renderPage();
+        });
+    </script>
+</body>
+</html>

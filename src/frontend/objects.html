@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Объекты недвижимости | CRM Агентства</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Защита страницы: без токена редирект на вход -->
+    <script>
+        if (!localStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="container mt-md mb-md flex" style="justify-content: space-between; align-items: center;">
+        <a href="index.html" class="btn btn-secondary btn-sm">← На главную</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Выйти</button>
+    </header>
+
+    <main class="container">
+        <!-- Заголовок и кнопка создания -->
+        <div class="flex mb-md" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <h2>Объекты недвижимости</h2>
+            <button id="addObjectBtn" class="btn btn-sm">+ Добавить объект</button>
+        </div>
+
+        <!-- Поиск -->
+        <div class="flex mb-md">
+            <input type="text" id="searchInput" class="input" placeholder="Поиск по адресу...">
+            <button class="btn btn-sm" onclick="searchObjects()">Найти</button>
+        </div>
+
+        <!-- Таблица объектов -->
+        <div class="card table-wrap">
+            <table id="objectsTable">
+                <thead>
+                    <tr>
+                        <th>Адрес</th>
+                        <th>Тип</th>
+                        <th>Площадь</th>
+                        <th>Стоимость</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="objectsTableBody">
+                    <!-- Данные подставляются через JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // ===== ЗАГЛУШКИ ДАННЫХ =====
+        const mockObjects = [
+            { id: 1, address: 'ул. Ленина, 10, кв. 5', type: 'Квартира', area: '65 м²', price: '12 000 000 ₽', status: 'Активен' },
+            { id: 2, address: 'пр. Мира, 45, оф. 302', type: 'Офис', area: '120 м²', price: '25 000 000 ₽', status: 'Забронирован' },
+            { id: 3, address: 'с. Лесное, ул. Сосновая, 12', type: 'Дом', area: '250 м²', price: '45 000 000 ₽', status: 'Продан' }
+        ];
+
+        // ===== РЕНДЕР ТАБЛИЦЫ =====
+        function renderObjects(list) {
+            const tbody = document.getElementById('objectsTableBody');
+            tbody.innerHTML = '';
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Объекты не найдены</td></tr>';
+                return;
+            }
+
+            list.forEach(obj => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="object-details.html?id=${obj.id}">${obj.address}</a></td>
+                    <td>${obj.type}</td>
+                    <td>${obj.area}</td>
+                    <td>${obj.price}</td>
+                    <td>${obj.status}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editObject(${obj.id})">Изменить</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===== ПОИСК (ЗАГЛУШКА) =====
+        function searchObjects() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            // TODO: Заменить на fetch(`/api/v1/objects/search?q=${encodeURIComponent(query)}`)
+            const filtered = mockObjects.filter(o => o.address.toLowerCase().includes(query));
+            renderObjects(filtered);
+        }
+
+        // ===== ДЕЙСТВИЯ (ЗАГЛУШКИ) =====
+        document.getElementById('addObjectBtn').addEventListener('click', () => {
+            alert('[Заглушка] Открытие формы создания. POST /api/v1/objects');
+        });
+
+        function editObject(id) {
+            alert(`[Заглушка] Редактирование объекта #${id}. PUT /api/v1/objects/${id}`);
+        }
+
+        // ===== ВЫХОД =====
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        });
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderObjects(mockObjects);
+
+            // Поиск по Enter
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchObjects();
+            });
+        });
+    </script>
+</body>
+</html>

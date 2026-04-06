@@ -1,0 +1,97 @@
+/* ===== ПЕРЕМЕННЫЕ ===== */
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --border: #d1d5db;
+    --radius: 6px;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+}
+
+/* ===== СБРОС И БАЗА ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: var(--space-md);
+}
+
+/* ===== LAYOUT ===== */
+.center-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+/* ===== КАРТОЧКИ ===== */
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: var(--space-xl);
+}
+
+/* ===== ТИПОГРАФИКА ===== */
+h1, h2, h3 { margin-bottom: var(--space-md); font-weight: 600; }
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); font-size: 0.875rem; }
+
+/* ===== ФОРМЫ ===== */
+.form-group { margin-bottom: var(--space-md); }
+.form-label { display: block; margin-bottom: var(--space-sm); font-weight: 500; }
+.input, .select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+.input:focus, .select:focus { outline: none; border-color: var(--primary); }
+
+/* ===== КНОПКИ ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.btn:hover { background: var(--primary-hover); }
+.btn-block { width: 100%; }
+.btn-secondary { background: var(--text-muted); }
+.btn-secondary:hover { background: #4b5563; }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.875rem; }
+
+/* ===== ТАБЛИЦЫ (для будущих списков) ===== */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin-top: var(--space-md); }
+th, td { padding: var(--space-sm) var(--space-md); text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #f9fafb; font-weight: 600; }
+
+/* ===== УТИЛИТЫ ===== */
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mb-md { margin-bottom: var(--space-md); }
+.flex { display: flex; gap: var(--space-md); align-items: center; }
+.flex-wrap { flex-wrap: wrap; }
+.hidden { display: none !important; }
